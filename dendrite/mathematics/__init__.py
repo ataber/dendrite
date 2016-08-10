@@ -1,0 +1,1 @@
+'''Inside the Mathematics init'''
