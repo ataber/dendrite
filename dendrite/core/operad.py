@@ -70,6 +70,11 @@ class Operad:
             input_tensors["gy"] = gy
             input_tensors["gz"] = gz
 
+            substituted = self.expression.subs({"f": self.inputs["f"].expression})
+            tensorflow_ready_expression = substituted.doit()
+          else:
+            tensorflow_ready_expression = self.expression
+
           for name, value in self.inputs.items():
             if isinstance(value, Operad):
               input_tensors[name] = value(X,Y,Z, **kwargs)
@@ -77,7 +82,8 @@ class Operad:
               input_tensors[name] = value
 
           variable_list = [x,y,z] + list(input_tensors.keys())
-          tf_lambda = sympy.lambdify(variable_list, self.expression, "tensorflow")
+
+          tf_lambda = sympy.lambdify(variable_list, tensorflow_ready_expression, "tensorflow")
           return tf_lambda(X,Y,Z,*input_tensors.values())
 
   def wrap_output(self, func):
