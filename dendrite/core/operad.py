@@ -19,10 +19,10 @@ class Operad:
   def __call__(self, X=x, Y=y, Z=z, **kwargs):
     if any([isinstance(c, Tensor) for c in [X,Y,Z]]):
       return self.compute_tensorflow(X,Y,Z, **kwargs)
-    elif any([isinstance(c, Number) for c in [X,Y,Z]]):
-      return self.symbolic_lambda(X,Y,Z)
-    else:
+    elif any([isinstance(c, sympy.Basic) for c in [X,Y,Z]]):
       return substitute(self.substitute_symbols(), {"x": X, "y": Y, "z": Z})
+    else:
+      return self.symbolic_lambda(X,Y,Z)
 
   @property
   def symbolic_lambda(self):
