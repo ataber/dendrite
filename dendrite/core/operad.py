@@ -10,7 +10,6 @@ class Operad:
     self.expression = expression
     self.lambda_expression = None
     self.inputs = {}
-    self.computed = False
     self.namespace = namespace
     self.functional_namespace = None
 

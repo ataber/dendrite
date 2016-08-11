@@ -39,5 +39,5 @@ class Geometry:
         arguments[name] = param
 
     functional = self.function(**arguments)
-    functional.functional_namespace = self.name
+    functional.functional_namespace = self.name.title()
     return functional
