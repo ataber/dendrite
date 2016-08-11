@@ -3,8 +3,9 @@ from dendrite.core.functional import Functional as F
 from dendrite.core.expression import Expression as E
 from dendrite.mathematics.elementary import bound
 from dendrite.transformations.domain import scale_inputs
+from dendrite.decorators.type_coercion import coerce_types
 
-@E
+@coerce_types
 def scale(a: F, s) -> F:
   return (a << scale_inputs(*(s,)*3)) * s
 
