@@ -22,33 +22,6 @@ class Volumetric:
 
     draw_op = functional(x,y,z)
 
-    with tf.name_scope("Inside"):
-      dim_lengths = [
-        (x[coordinate_shape[0]-1,0,0] - x[0,0,0]) / coordinate_shape[0],
-        (y[0,coordinate_shape[1]-1,0] - y[0,0,0]) / coordinate_shape[1],
-        (z[0,0,coordinate_shape[2]-1] - z[0,0,0]) / coordinate_shape[2],
-      ]
-      voxel_volume = dim_lengths[0] * dim_lengths[1] * dim_lengths[2]
-      inside = tf.sign(tf.maximum(draw_op, tf.zeros_like(draw_op)))
-
-    with tf.name_scope("CalculateVolume"):
-      volume_op = tf.reduce_sum(inside) * voxel_volume
-
-    with tf.name_scope("COM"):
-      x_com = tf.reduce_sum(inside * x * voxel_volume) / volume_op
-      y_com = tf.reduce_sum(inside * y * voxel_volume) / volume_op
-      z_com = tf.reduce_sum(inside * z * voxel_volume) / volume_op
-      com = tf.pack([x_com, y_com, z_com])
-
-    with tf.name_scope("IntertialMoment"):
-      x_cm = x + x_com
-      y_cm = y + y_com
-      z_cm = z + z_com
-      i_xx = tf.reduce_sum(inside * (tf.square(y_cm) + tf.square(z_cm)) * voxel_volume)
-      i_yy = tf.reduce_sum(inside * (tf.square(x_cm) + tf.square(z_cm)) * voxel_volume)
-      i_zz = tf.reduce_sum(inside * (tf.square(x_cm) + tf.square(y_cm)) * voxel_volume)
-      inertia = tf.pack([i_xx, i_yy, i_zz])
-
     graph = Graph(geometry, debug=debug)
     graph.run(tf.initialize_all_variables())
     graph.session.graph.finalize()
@@ -56,15 +29,9 @@ class Volumetric:
     self.graph = graph
     self.placeholders = placeholders
     self.coordinate_shape = coordinate_shape
-    self.ops = {
-      "draw": draw_op,
-      "volume": volume_op,
-      "com": com,
-      "inertia": inertia
-    }
+    self.ops = {"draw": draw_op}
 
-  def run(self, bounds=[[-1,-1,-1],[1,1,1]], op_names=["draw"]):
+  def run(self, bounds=[[-1,-1,-1],[1,1,1]]):
     print("Running: Volumetric")
-    ops = [self.ops[op_name] for op_name in op_names]
     with self.graph.tensorboard_logging("Volumetric"):
-      return self.graph.run(ops, {})
+      return self.graph.run(self.ops["draw"], {})
