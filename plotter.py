@@ -8,12 +8,12 @@ from dendrite.calculation.volumetric import *
 from dendrite.calculation.raytracer import *
 
 def raytrace(Object):
-  raytracer = Raytracer(Object)
+  raytracer = Raytracer(Object, debug)
   raytracer.run()
 
 def export_to_obj(geometry, resolution, bounds):
-  volumetric = Volumetric(geometry, resolution, bounds)
-  rendered = volumetric.run()[0]
+  volumetric = Volumetric(geometry, resolution, bounds, debug)
+  rendered = volumetric.run()
   vertices, triangles = mcubes.marching_cubes(rendered, 0)
   shifted = []
   step_size = [(bounds[1][i] - bounds[0][i]) / resolution[i] for i in [0,1,2]]
@@ -24,12 +24,12 @@ def export_to_obj(geometry, resolution, bounds):
   mcubes.export_obj(shifted, triangles, geometry.name+".obj")
 
 def export_to_graph_def(geometry):
-  graph = Graph(geometry)
+  graph = Graph(geometry, debug)
   graph_def = graph.session.graph.as_graph_def()
   tf.train.write_graph(graph_def, "./", geometry.name + ".pbtxt", True)
 
 def export_to_cli(geometry, resolution, bounds):
-  volumetric = Volumetric(geometry, resolution, bounds)
+  volumetric = Volumetric(geometry, resolution, bounds, debug)
   rendered = volumetric.run()[0]
 
   unit = 0.001 # 0.001mm
@@ -71,6 +71,6 @@ def export_to_cli(geometry, resolution, bounds):
 
 if __name__ == "__main__":
   object_name = sys.argv[1]
+  debug = bool(sys.argv[2] if len(sys.argv) > 2 else False)
   Object = importlib.import_module("dendrite.parts."+object_name)
-  export_to_obj(Object.geometry, Object.default_resolution, Object.default_bounds)
-  # raytrace(Object.geometry)
+  export_to_obj(Object.model, Object.default_resolution, Object.default_bounds)

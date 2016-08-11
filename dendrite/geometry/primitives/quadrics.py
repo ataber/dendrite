@@ -3,15 +3,14 @@ from sympy.abc import x,y,z
 from dendrite.core.functional import Functional as F
 from dendrite.core.expression import Expression as E
 from dendrite.mathematics.elementary import sqrt
-from dendrite.decorators.type_coercion import coerce_output
 
 @E
 def sphere(radius: float) -> F:
-  return radius - sqrt(x**2 + y**2 + z**2)
+  return radius**2 - (x**2 + y**2 + z**2)
 
 @E
 def torus(major_radius: float, minor_radius: float) -> F:
-  return minor_radius - sqrt((sqrt(y**2 + z**2) - major_radius)**2 + x**2)
+  return minor_radius**2 - (sqrt(y**2 + z**2) - major_radius)**2 + x**2
 
 @E
 def ellipsoid(x_radius: float, y_radius: float, z_radius: float) -> F:
