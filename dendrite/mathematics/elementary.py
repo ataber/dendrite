@@ -35,14 +35,6 @@ def reduce_sum(t):
   else:
     return np.sum(t, axis=0)
 
-def square(t):
-  if isinstance(t, tf.Tensor):
-    return tf.square(t)
-  elif isinstance(t, sympy.Expr):
-    return t**2
-  else:
-    return np.square(t)
-
 def sqrt(t):
   if isinstance(t, tf.Tensor):
     return tf.sqrt(t)
