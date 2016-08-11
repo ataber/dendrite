@@ -6,12 +6,7 @@ from dendrite.core.geometry import Geometry
 
 class Volumetric:
   def __init__(self, geometry, coordinate_shape, bounds, debug=False):
-    if isinstance(geometry, Geometry):
-      functional = geometry.functional
-    elif isinstance(geometry, Functional):
-      functional = geometry
-    else:
-      raise ValueError("Can't evaluate instance of %s" % type(geometry))
+    functional = geometry.functional
 
     placeholders = {}
 

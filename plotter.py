@@ -3,8 +3,9 @@ import tensorflow as tf
 import mcubes
 import importlib
 import sys
-from dendrite.calculation import *
-from dendrite.core.geometry import *
+from dendrite.calculation.graph import *
+from dendrite.calculation.volumetric import *
+from dendrite.calculation.raytracer import *
 
 def raytrace(Object):
   raytracer = Raytracer(Object)
@@ -70,6 +71,6 @@ def export_to_cli(geometry, resolution, bounds):
 
 if __name__ == "__main__":
   object_name = sys.argv[1]
-  Object = importlib.import_module("Parts."+object_name)
+  Object = importlib.import_module("dendrite.parts."+object_name)
   export_to_obj(Object.geometry, Object.default_resolution, Object.default_bounds)
   # raytrace(Object.geometry)

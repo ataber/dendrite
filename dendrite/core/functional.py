@@ -1,12 +1,12 @@
 import sympy
 from sympy.abc import x,y,z
+from numbers import Number
+from tensorflow import Tensor
 from dendrite.core.operad import Operad
 from dendrite.core.algebra import Algebra
 from dendrite.core.transformation import Transformation
 from dendrite.core.expression import Expression
 from dendrite.mathematics.elementary import Max, Min
-from numbers import Number
-from tensorflow import Tensor
 
 def convert_to_functional(obj):
   if isinstance(obj, Number):

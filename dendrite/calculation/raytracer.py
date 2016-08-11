@@ -2,7 +2,6 @@ import numpy as np
 import tensorflow as tf
 from dendrite.mathematics.metric import *
 from dendrite.core.functional import Functional
-from dendrite.core.geometry import Geometry
 from dendrite.calculation.graph import Graph
 
 def vector_fill(shape, vector):

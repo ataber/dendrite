@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-import contextlib
+from contextlib import contextmanager
 from time import strftime
 
 class Graph:
@@ -10,7 +10,7 @@ class Graph:
     self.summary_writer = None
     self.initialize_session()
 
-  @contextlib.contextmanager
+  @contextmanager
   def tensorboard_logging(self, tag_prefix):
     try:
       if self.debug:
@@ -48,9 +48,7 @@ class Graph:
       self.summary_writer.add_summary(self.session.run(summary_op, feed_dict=feed_dict))
 
   def merge_feeds(self, feed):
-    feed_dict = {}
-    for placeholder, value in feed.items():
-      feed_dict[placeholder] = value
+    feed_dict = feed.copy()
 
     for name, placeholder in self.geometry.placeholders.items():
       feed_dict[placeholder] = self.geometry.parameters[name]
