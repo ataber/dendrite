@@ -2,7 +2,7 @@ import inspect
 import sympy
 from sympy.abc import x,y,z
 from numbers import Number
-from tensorflow import name_scope, Tensor
+from tensorflow import name_scope, Tensor, convert_to_tensor, float32
 from collections import OrderedDict
 
 class Operad:
@@ -70,7 +70,8 @@ class Operad:
             input_tensors["gy"] = gy
             input_tensors["gz"] = gz
 
-            substituted = self.expression.subs({"f": self.inputs["f"].expression})
+            f = self.inputs["f"]
+            substituted = self.expression.subs({"f": f()})
             tensorflow_ready_expression = substituted.doit()
           else:
             tensorflow_ready_expression = self.expression
@@ -79,7 +80,7 @@ class Operad:
             if isinstance(value, Operad):
               input_tensors[name] = value(X,Y,Z, **kwargs)
             else:
-              input_tensors[name] = value
+              input_tensors[name] = convert_to_tensor(value, dtype=float32)
 
           variable_list = [x,y,z] + list(input_tensors.keys())
 

@@ -15,4 +15,4 @@ class SphereTest(unittest.TestCase):
 
   def test_FunctionalArgs(self):
     s = sphere(1-z+x*y)
-    self.assertTrue(s(0,0,0) == 1)
+    self.assertEqual(s(0,0,0), 1)

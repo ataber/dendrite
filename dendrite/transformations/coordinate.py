@@ -1,8 +1,8 @@
 from sympy.abc import x,y,z
-from Core.Transformation import Transformation as T
-from Core.Expression import Expression
-from Mathematics.Elementary import sqrt
-from Mathematics.Trigonometry import arctan, arccos
+from dendrite.core.transformation import Transformation as T
+from dendrite.core.expression import Expression
+from dendrite.mathematics.elementary import sqrt
+from dendrite.mathematics.trigonometry import arctan, arccos
 
 @Expression
 def cylindrical() -> T:

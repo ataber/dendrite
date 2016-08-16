@@ -6,8 +6,7 @@ import sympy
 
 registered_converters = {
   # np.array is not a class, just a function for creating ndarrays
-  np.ndarray: np.array,
-  sympy.Expr: sympy.sympify
+  np.ndarray: np.array
 }
 
 def wrap_output(cls):
