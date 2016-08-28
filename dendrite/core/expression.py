@@ -2,7 +2,6 @@ import inspect
 import sympy
 import numpy as np
 from functools import partial
-from sympy.abc import x,y,z
 from collections import OrderedDict
 from dendrite.decorators.type_coercion import coerce_output
 from dendrite.core.operad import Operad
@@ -26,7 +25,7 @@ class Expression:
       substitute_dict[arg_list[i][0]] = arg
 
     for name, arg in kwargs.items():
-      substitute_dict[self.arguments[name]] = arg
+      substitute_dict[name] = arg
 
     for name, arg in substitute_dict.items():
       if arg is inspect.Parameter.empty:
@@ -34,6 +33,8 @@ class Expression:
 
     def to_argument(s):
       annotation = self.parameters[s].annotation
+
+      # These types should not be symbolized
       pass_through_types = (list, str, int, tuple, Operad)
       type_converters = {
         np.ndarray: np.array,
@@ -51,5 +52,11 @@ class Expression:
         return sympy.Symbol(s)
 
     operad = coerce_output(self.function)(*[to_argument(s) for s in self.arguments])
-    operad.set_inputs(**substitute_dict)
+
+    # Do not attempt to substitute string params, like dimension, etc
+    def substitutable(s):
+      return not issubclass(self.parameters[s].annotation, str)
+    input_dict = {k: substitute_dict[k] for k in substitute_dict if substitutable(k)}
+
+    operad.set_inputs(**input_dict)
     return operad
