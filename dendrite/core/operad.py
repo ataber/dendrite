@@ -38,12 +38,13 @@ class Operad:
       subs["gx"] = gx
       subs["gy"] = gy
       subs["gz"] = gz
-
-    for name, value in self.inputs.items():
-      if isinstance(value, Operad):
-        subs[name] = value.substitute_symbols()
-      else:
-        subs[name] = value
+      subs["f"] = self.inputs["f"].substitute_symbols()
+    else:
+      for name, value in self.inputs.items():
+        if isinstance(value, Operad):
+          subs[name] = value.substitute_symbols()
+        else:
+          subs[name] = value
 
     return substitute(self.expression, subs)
 
@@ -71,10 +72,7 @@ class Operad:
             input_tensors["gz"] = gz
 
             f = self.inputs["f"]
-            substituted = self.expression.subs({"f": f()})
-            tensorflow_ready_expression = substituted.doit()
-          else:
-            tensorflow_ready_expression = self.expression
+            return f(gx, gy, gz, **kwargs)
 
           for name, value in self.inputs.items():
             if isinstance(value, Operad):
@@ -84,7 +82,7 @@ class Operad:
 
           variable_list = [x,y,z] + list(input_tensors.keys())
 
-          tf_lambda = sympy.lambdify(variable_list, tensorflow_ready_expression, "tensorflow")
+          tf_lambda = sympy.lambdify(variable_list, self.expression, "tensorflow")
           return tf_lambda(X,Y,Z,*input_tensors.values())
 
   def wrap_output(self, func):
