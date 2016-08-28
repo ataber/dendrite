@@ -12,9 +12,9 @@ def eliminate_variable(dependent, variable):
     print("Unable to eliminate %s from %s" % (variable, dependent))
     raise(e)
   if independent == 0:
-    raise ValueError("Unable to eliminate %s from %s: too dependent" % (variable, dependent))
+    raise ValueError("Unable to eliminate %s from %s: is the polynomial time-dependent?" % (variable, dependent))
   else:
-    return independent
+    return sympy.factor(independent)
 
 @coerce_output
 def channel_surface(radius, directrix: tuple) -> F:

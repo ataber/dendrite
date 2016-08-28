@@ -22,9 +22,7 @@ def bound(t, a, b):
   return Min(Max(t, a), b)
 
 def floor(t):
-  if isinstance(t, tf.Tensor):
-    return tf.floor(t)
-  elif isinstance(t, sympy.Expr):
+  if isinstance(t, sympy.Expr):
     return sympy.floor(t)
   else:
     return np.floor(t)
@@ -36,9 +34,7 @@ def reduce_sum(t):
     return np.sum(t, axis=0)
 
 def sqrt(t):
-  if isinstance(t, tf.Tensor):
-    return tf.sqrt(t)
-  elif isinstance(t, sympy.Expr):
+  if isinstance(t, sympy.Expr):
     return sympy.sqrt(t)
   elif callable(t):
     return t.wrap_output(sqrt)
@@ -46,9 +42,7 @@ def sqrt(t):
     return np.sqrt(t)
 
 def exp(t):
-  if isinstance(t, tf.Tensor):
-    return tf.exp(t)
-  elif isinstance(t, sympy.Expr):
+  if isinstance(t, sympy.Expr):
     return sympy.exp(t)
   elif callable(t):
     return t.wrap_output(exp)
@@ -56,9 +50,7 @@ def exp(t):
     return np.exp(t)
 
 def log(t):
-  if isinstance(t, tf.Tensor):
-    return tf.log(t)
-  elif isinstance(t, sympy.Expr):
+  if isinstance(t, sympy.Expr):
     return sympy.log(t)
   elif callable(t):
     return t.wrap_output(log)

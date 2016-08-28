@@ -16,10 +16,6 @@ def ellipsoid(x_radius: float, y_radius: float, z_radius: float) -> F:
   return (1 - ((x / x_radius)**2 + (y / y_radius)**2 + (z / z_radius)**2)) * Min(x_radius, y_radius, z_radius)
 
 @E
-def ellipse(x_radius: float, y_radius: float) -> F:
-  return (1 - ((x / x_radius)**2 + (y / y_radius)**2)) * Min(x_radius, y_radius)
-
-@E
 def superquadric(r: float, s: float, t: float) -> F:
   return 1 - abs(x)**r - abs(y)**s - abs(z)**t
 
@@ -27,10 +23,6 @@ def superquadric(r: float, s: float, t: float) -> F:
 def sphere_squared(radius: float) -> F:
   # This returns the squared distance field. Same isosurface as sphere. Required for channel surfaces.
   return radius**2 - (x**2 + y**2 + z**2)
-
-@E
-def torus_squared(major_radius: float, minor_radius: float) -> F:
-  return minor_radius**2 - (sqrt(y**2 + z**2) - major_radius)**2 + x**2
 
 @E
 def cylinder(radius: float) -> F:
