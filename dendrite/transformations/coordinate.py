@@ -2,7 +2,7 @@ from sympy.abc import x,y,z
 from dendrite.core.transformation import Transformation as T
 from dendrite.core.expression import Expression
 from dendrite.mathematics.elementary import sqrt
-from dendrite.mathematics.trigonometry import arctan, arccos
+from dendrite.mathematics.trigonometry import arctan, arccos, cos, sin
 
 @Expression
 def cylindrical() -> T:
@@ -18,3 +18,9 @@ def spherical() -> T:
   fy = arccos(z/r)
   fx = arctan(y/x)
   return (fx,fy,fz)
+
+@Expression
+def twist(theta) -> T:
+  c = cos(theta)
+  s = sin(theta)
+  return (x*c - y*s, x*s + y*c, z)
