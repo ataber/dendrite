@@ -22,3 +22,8 @@ Run Native.py (to be replaced with button)
 Click Render
 
 ```
+
+Recommended first test:
+1. Download Meshlab
+2. Run `python plotter.py hexagonal_tiling`
+3. Load model.stl into Meshlab
