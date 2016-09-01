@@ -36,23 +36,17 @@ def reduce_sum(t):
 def sqrt(t):
   if isinstance(t, sympy.Expr):
     return sympy.sqrt(t)
-  elif callable(t):
-    return t.wrap_output(sqrt)
   else:
     return np.sqrt(t)
 
 def exp(t):
   if isinstance(t, sympy.Expr):
     return sympy.exp(t)
-  elif callable(t):
-    return t.wrap_output(exp)
   else:
     return np.exp(t)
 
 def log(t):
   if isinstance(t, sympy.Expr):
     return sympy.log(t)
-  elif callable(t):
-    return t.wrap_output(log)
   else:
     return np.log(t)
