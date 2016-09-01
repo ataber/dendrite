@@ -8,15 +8,16 @@ from dendrite.core.operad import Operad
 
 class Expression:
   def __init__(self, function):
-    self.arguments = OrderedDict()
     self.function = function
     self.parameters = inspect.signature(self.function).parameters
+    self.arguments = OrderedDict()
+    # Note the order of this dictionary is necessary for lining up positional args at call time
     for name, param in self.parameters.items():
       self.arguments[name] = param.default
 
   def __call__(self, *args, **kwargs):
-    substitute_dict = self.arguments.copy()
     arg_list = list(self.arguments.items())
+    substitute_dict = self.arguments.copy()
 
     if len(args) > len(arg_list):
       raise ValueError("Too many args: " + str(args))
@@ -36,7 +37,9 @@ class Expression:
 
       # These types should not be symbolized
       pass_through_types = (list, str, int, tuple, Operad)
+
       type_converters = {
+        # np.array is not a class, just a function for creating ndarrays
         np.ndarray: np.array,
         # This is a hack to ensure the coefficients of polynomials are rational for variable elimination
         float: lambda f: sympy.sympify(str(f), rational=True)

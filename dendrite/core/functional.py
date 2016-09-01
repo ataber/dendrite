@@ -1,5 +1,5 @@
 import sympy
-from sympy.abc import x,y,z
+from functools import partial
 from numbers import Number
 from tensorflow import Tensor
 from dendrite.core.operad import Operad
@@ -7,14 +7,7 @@ from dendrite.core.algebra import Algebra
 from dendrite.core.transformation import Transformation
 from dendrite.core.expression import Expression
 from dendrite.mathematics.elementary import Max, Min
-
-def convert_to_functional(obj):
-  if isinstance(obj, Number):
-    return Functional(sympy.sympify(obj), namespace=str(obj))
-  elif isinstance(obj, Functional):
-    return obj
-  else:
-    return Functional(obj, namespace=str(obj))
+from dendrite.decorators.type_coercion import convert_to_operad
 
 class Functional(Operad, Algebra):
   def __init__(self, expr, namespace=None):
@@ -78,8 +71,9 @@ class Functional(Operad, Algebra):
       @Expression
       def composition(f, g: sympy.Tuple) -> Functional:
         # Hack due to Subs not doing simultaneous substitution
-        fx, fy, fz = sympy.symbols("fx fy fz")
-        return sympy.Subs(sympy.Subs(f, (x,y,z), (fx,fy,fz)), (fx,fy,fz), g)
+        return sympy.Subs(sympy.Subs(f, ('x', 'y', 'z'), ('fx', 'fy', 'fz')), ('fx', 'fy', 'fz'), g)
       return composition(self, other)
     else:
       super().__lshift__(other)
+
+convert_to_functional = partial(convert_to_operad, Functional)
