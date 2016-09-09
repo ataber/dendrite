@@ -11,7 +11,8 @@ class Transformation(Operad):
     if isinstance(other, Transformation):
       @Expression
       def composition(f, g: sympy.Tuple) -> Transformation:
-        return sympy.Subs(f, (x,y,z), g)
+        # Hack due to Subs not doing simultaneous substitution
+        return sympy.Subs(sympy.Subs(f, ('x', 'y', 'z'), ('fx', 'fy', 'fz')), ('fx', 'fy', 'fz'), g)
       return composition(self, other)
     else:
       super().__lshift__(other)

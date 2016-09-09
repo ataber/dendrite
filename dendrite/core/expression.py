@@ -36,13 +36,11 @@ class Expression:
       annotation = self.parameters[s].annotation
 
       # These types should not be symbolized
-      pass_through_types = (list, str, int, tuple, Operad)
+      pass_through_types = (list, str, int, float, tuple, Operad)
 
       type_converters = {
         # np.array is not a class, just a function for creating ndarrays
         np.ndarray: np.array,
-        # This is a hack to ensure the coefficients of polynomials are rational for variable elimination
-        float: lambda f: sympy.sympify(str(f), rational=True)
       }
 
       if issubclass(annotation, sympy.Tuple):
@@ -54,12 +52,19 @@ class Expression:
       else:
         return sympy.Symbol(s)
 
-    operad = coerce_output(self.function)(*[to_argument(s) for s in self.arguments])
+    symbols = [to_argument(s) for s in self.arguments]
+    operad = coerce_output(self.function)(*symbols)
 
-    # Do not attempt to substitute string params, like dimension, etc
-    def substitutable(s):
-      return not issubclass(self.parameters[s].annotation, str)
-    input_dict = {k: substitute_dict[k] for k in substitute_dict if substitutable(k)}
+    if isinstance(operad.expression, sympy.Subs):
+      input_dict = {
+        "f": substitute_dict["f"],
+        "g": substitute_dict["g"]
+      }
+    else:
+      input_dict = {
+        k.name: substitute_dict[k.name]
+        for k in symbols if isinstance(k, sympy.Symbol)
+      }
 
     operad.set_inputs(**input_dict)
     return operad

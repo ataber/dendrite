@@ -10,7 +10,7 @@ def translate(offset: np.ndarray) -> T:
   return (x-a, y-b, z-c)
 
 @E
-def rotate(axis: np.ndarray, radians: float) -> T:
+def rotate(axis: np.ndarray, radians) -> T:
   return tuple(np.dot(axis_angle_matrix(axis, radians), [x,y,z]))
 
 @E

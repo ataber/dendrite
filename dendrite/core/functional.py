@@ -60,8 +60,10 @@ class Functional(Operad, Algebra):
     return union(self, other)
 
   def __floordiv__(self, other):
-    # Funky version of subtraction CSG op
-    return self & ~other
+    @Expression
+    def subtract(a, b) -> Functional:
+      return Min(a, -b)
+    return subtract(self, other)
 
   def __neg__(self):
     return ~self
