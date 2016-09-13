@@ -13,14 +13,13 @@ class Volumetric:
     min_bounds, max_bounds = bounds
     resolutions = list(map(lambda x: x*1j, coordinate_shape))
     space_grid = np.mgrid[min_bounds[0]:max_bounds[0]:resolutions[0],min_bounds[1]:max_bounds[1]:resolutions[1],min_bounds[2]:max_bounds[2]:resolutions[2]]
-    space = tf.Variable(space_grid.astype(np.float32), name="Space", trainable=False)
-
-    # Name TF ops for better graph visualization
-    x = tf.squeeze(tf.slice(space, [0,0,0,0], [1,-1,-1,-1]), squeeze_dims=[0], name="X-Coordinates")
-    y = tf.squeeze(tf.slice(space, [1,0,0,0], [1,-1,-1,-1]), squeeze_dims=[0], name="Y-Coordinates")
-    z = tf.squeeze(tf.slice(space, [2,0,0,0], [1,-1,-1,-1]), squeeze_dims=[0], name="Z-Coordinates")
+    space_grid = space_grid.astype(np.float32)
+    x = tf.Variable(space_grid[0,:,:,:], trainable=False, name="X-Coordinates")
+    y = tf.Variable(space_grid[1,:,:,:], trainable=False, name="Y-Coordinates")
+    z = tf.Variable(space_grid[2,:,:,:], trainable=False, name="Z-Coordinates")
 
     draw_op = functional(x,y,z)
+    sanity_checked = tf.verify_tensor_all_finite(draw_op, "Sanity Check Failed", name="SanityCheck")
 
     graph = Graph(geometry, debug=debug)
     graph.run(tf.initialize_all_variables())
@@ -29,7 +28,7 @@ class Volumetric:
     self.graph = graph
     self.placeholders = placeholders
     self.coordinate_shape = coordinate_shape
-    self.ops = {"draw": draw_op}
+    self.ops = {"draw": sanity_checked}
 
   def run(self, bounds=[[-1,-1,-1],[1,1,1]]):
     print("Running: Volumetric")
