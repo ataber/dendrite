@@ -30,7 +30,7 @@ class Expression:
 
     for name, arg in substitute_dict.items():
       if arg is inspect.Parameter.empty:
-        raise ValueError("No value provided for " +name)
+        raise ValueError(self.function.__name__+": No value provided for " +name)
 
     def to_argument(s):
       annotation = self.parameters[s].annotation
