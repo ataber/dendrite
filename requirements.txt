@@ -1,7 +1,6 @@
-numpy    
-cython    
-PyMCubes   
-scikit-image    
-https://storage.googleapis.com/tensorflow/mac/tensorflow-0.9.0rc0-py3-none-any.whl
+numpy
+cython
+PyMCubes
+scikit-image
+https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-0.10.0rc0-py3-none-any.whl
 sympy
-

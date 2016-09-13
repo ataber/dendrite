@@ -1,14 +1,15 @@
 import inspect
 import sympy
 import tensorflow as tf
-from sympy.abc import x, y, z
+from sympy.abc import x, y, z, t
 from numbers import Number
 from collections import OrderedDict
 from dendrite.codegen.glsl_codegen import glslcodegen
 
 class Operad:
-  def __init__(self, expression, namespace=None):
+  def __init__(self, expression, namespace=None, to_solve=None):
     self.expression = expression
+    self._to_solve = to_solve
     self._symbolic_lambda = None
     self.inputs = {}
     self.namespace = namespace
@@ -18,7 +19,7 @@ class Operad:
     self.inputs = {**inputs, **self.inputs}
 
   def __call__(self, X=x, Y=y, Z=z, scope=None, functional_scope=None):
-    if any([isinstance(c, tf.Tensor) for c in [X, Y, Z]]):
+    if any([isinstance(c, (tf.Variable, tf.Tensor)) for c in [X, Y, Z]]):
       return self.compute_tensorflow(X, Y, Z, scope=scope, functional_scope=functional_scope)
     return self.symbolic_lambda(X, Y, Z)
 
@@ -62,6 +63,9 @@ class Operad:
             return f(gx, gy, gz, scope=scope, functional_scope=functional_scope)
 
           input_tensors = OrderedDict()
+          for sym, tens in zip([x,y,z], [X,Y,Z]):
+            input_tensors[sym] = tens
+
           for name, value in self.inputs.items():
             if isinstance(value, Operad):
               input_tensors[name] = value(X, Y, Z, scope=scope, functional_scope=functional_scope)
@@ -70,10 +74,29 @@ class Operad:
             else:
               input_tensors[name] = tf.convert_to_tensor(value, dtype=tf.float32)
 
-          variable_list = [x, y, z] + list(input_tensors.keys())
+          # expression is time-dependent, must solve for t
+          if self._to_solve is not None:
+            condition = lambda i, _: i < 20
+            def body(i, _t):
+              input_tensors[t] = _t
+              variable_list = list(input_tensors.keys())
+              to_solve = sympy.lambdify(variable_list, self._to_solve, "tensorflow")
+              residual = to_solve(*input_tensors.values())
+              residual = tf.Print(residual, [residual[45:50,45:50,45:50]])
+              gradient = tf.gradients(residual, [_t])[0]
+              gradient = tf.Print(gradient, [gradient[45:50,45:50,45:50]])
+              return (i+1, _t - (residual / gradient))
 
+            time = tf.zeros(X.get_shape(), name="Time_"+self.namespace)
+            _, solution = tf.while_loop(
+              condition,
+              body,
+              [tf.constant(0), time])
+            input_tensors[t] = solution
+
+          variable_list = list(input_tensors.keys())
           tf_lambda = sympy.lambdify(variable_list, self.expression, "tensorflow")
-          return tf_lambda(X, Y, Z, *input_tensors.values())
+          return tf_lambda(*input_tensors.values())
 
   def __lshift__(self, other):
     raise ValueError("Can not compose types: %s and %s" % (type(self), type(other)))

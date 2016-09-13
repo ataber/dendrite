@@ -1,4 +1,5 @@
 import sympy
+from sympy.abc import t
 from functools import partial
 from numbers import Number
 from tensorflow import Tensor
