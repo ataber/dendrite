@@ -34,14 +34,12 @@ def generalized_cylindrical(directrix: np.ndarray) -> TDT:
   p = np.array([x,y,z])
   p_prime = p - directrix
 
-  # Solutions to this equation are the positions on the normal plane
-  normal_plane = np.dot(p_prime, tangent)
-
-  distance = sum([c**2 for c in p_prime])
-  normal_coord = normal.dot(p_prime)
-  binormal_coord = binormal.dot(p_prime)
+  distance = sqrt(sum([c**2 for c in p_prime]))
+  # should p_prime be normalized? it looks better when normalized...
+  normal_coord = normal.dot(p_prime / distance)
+  binormal_coord = binormal.dot(p_prime / distance)
   theta = arctan(normal_coord / binormal_coord)
-  return ((theta, t, distance), normal_plane)
+  return ((theta, t, distance), distance)
 
 @E
 def spherical() -> T:

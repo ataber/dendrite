@@ -7,9 +7,9 @@ from collections import OrderedDict
 from dendrite.codegen.glsl_codegen import glslcodegen
 
 class Operad:
-  def __init__(self, expression, namespace=None, to_solve=None):
+  def __init__(self, expression, namespace=None, to_minimize=None):
     self.expression = expression
-    self._to_solve = to_solve
+    self._to_minimize = to_minimize
     self._symbolic_lambda = None
     self.inputs = {}
     self.namespace = namespace
@@ -75,23 +75,42 @@ class Operad:
               input_tensors[name] = tf.convert_to_tensor(value, dtype=tf.float32)
 
           # expression is time-dependent, must solve for t
-          if self._to_solve is not None:
-            condition = lambda i, _: i < 20
-            def body(i, _t):
-              input_tensors[t] = _t
-              variable_list = list(input_tensors.keys())
-              to_solve = sympy.lambdify(variable_list, self._to_solve, "tensorflow")
-              residual = to_solve(*input_tensors.values())
-              residual = tf.Print(residual, [residual[45:50,45:50,45:50]])
-              gradient = tf.gradients(residual, [_t])[0]
-              gradient = tf.Print(gradient, [gradient[45:50,45:50,45:50]])
-              return (i+1, _t - (residual / gradient))
+          if self._to_minimize is not None:
+            condition = lambda i, a, b: i < 30
+            def body(i, left, right):
+              expression_to_solve = sympy.fraction(sympy.diff(self._to_minimize, t))[0]
+              lambda_to_solve = sympy.lambdify(
+                list(input_tensors.keys())+[t],
+                expression_to_solve,
+                "tensorflow"
+              )
+              left_residual = lambda_to_solve(*input_tensors.values(), left)
+              right_residual = lambda_to_solve(*input_tensors.values(), right)
+              mean = (left + right) / 2
+              mean_residual = lambda_to_solve(*input_tensors.values(), mean)
+              differing_signs = tf.not_equal(tf.sign(left_residual), tf.sign(right_residual))
+              same_sign_as_mean = lambda side_residual: tf.equal(tf.sign(side_residual), tf.sign(mean_residual))
+              select = lambda side, res: tf.select(tf.logical_and(differing_signs, same_sign_as_mean(res)), mean, side)
+              left_conditional = select(left, left_residual)
+              right_conditional = select(right, right_residual)
+              return (i+1, left_conditional, right_conditional)
 
-            time = tf.zeros(X.get_shape(), name="Time_"+self.namespace)
-            _, solution = tf.while_loop(
+            left_bound = tf.zeros(X.get_shape(), name="left_bound_"+self.namespace)
+            right_bound = tf.constant(3.0, shape=X.get_shape(), name="right_bound_"+self.namespace)
+            _, left, right = tf.while_loop(
               condition,
               body,
-              [tf.constant(0), time])
+              [tf.constant(0), left_bound, right_bound])
+
+            minimize_lambda = sympy.lambdify(
+              list(input_tensors.keys())+[t],
+              self._to_minimize,
+              "tensorflow"
+            )
+
+            left_value = minimize_lambda(*input_tensors.values(), left)
+            right_value = minimize_lambda(*input_tensors.values(), right)
+            solution = tf.select(tf.less_equal(left_value, right_value), left, right)
             input_tensors[t] = solution
 
           variable_list = list(input_tensors.keys())

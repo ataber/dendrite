@@ -46,9 +46,7 @@ def distance_surface(radius: F, directrix: tuple) -> TDF:
   distance_to_curve = [coordinate - curve for coordinate, curve in zip([x,y,z], directrix)]
   time_dependent = sphere(radius)(*distance_to_curve)
   diff_t = sympy.diff(time_dependent, t)
-  # Solve the numerator only, else will have to deal with radical denominator
-  extremal_points = sympy.fraction(diff_t)[0]
-  return (time_dependent, extremal_points)
+  return (time_dependent, time_dependent)
 
 @E
 def interpolating_canal(radius: F, endpoints: list, tangents: list) -> F:
