@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+from dendrite.mathematics.elementary import sqrt
 
 def dot(a, b):
   if isinstance(a, tf.Tensor):
@@ -15,4 +16,4 @@ def norm(vector):
     with tf.name_scope("Norm"):
       return tf.sqrt(tf.reduce_sum(tf.square(vector), reduction_indices=0))
   else:
-    return np.linalg.norm(vector)
+    return sqrt(sum([c**2 for c in vector]))

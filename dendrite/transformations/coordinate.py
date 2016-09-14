@@ -8,6 +8,7 @@ from dendrite.core.functional import Functional as F
 from dendrite.core.expression import Expression as E
 from dendrite.mathematics.elementary import sqrt
 from dendrite.mathematics.trigonometry import arctan, arccos
+from dendrite.mathematics.metric import norm
 
 @E
 def cylindrical() -> T:
@@ -26,18 +27,17 @@ def generalized_cylindrical(directrix: np.ndarray) -> TDT:
   if not np.any(normal):
     raise ValueError("Directrix %s must have non-vanishing curvature." % directrix)
 
-  normal /= sum([n**2 for n in normal])
+  normal /= norm(normal)
 
   binormal = np.cross(tangent, normal)
-  binormal /= sum([b**2 for b in binormal])
+  binormal /= norm(binormal)
 
   p = np.array([x,y,z])
   p_prime = p - directrix
 
-  distance = sqrt(sum([c**2 for c in p_prime]))
-  # should p_prime be normalized? it looks better when normalized...
-  normal_coord = normal.dot(p_prime / distance)
-  binormal_coord = binormal.dot(p_prime / distance)
+  distance = norm(p_prime)
+  normal_coord = normal.dot(p_prime)
+  binormal_coord = binormal.dot(p_prime)
   theta = arctan(normal_coord / binormal_coord)
   return ((theta, t, distance), distance)
 
