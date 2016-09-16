@@ -1,8 +1,9 @@
 import numpy as np
 from dendrite.mathematics.trigonometry import cos, sin
+from dendrite.mathematics.metric import norm
 
 def axis_angle_matrix(axis, angle):
-  axis = axis / np.linalg.norm(axis)
+  axis = axis / norm(axis)
   ux, uy, uz = axis
   c = cos(angle)
   s = sin(angle)
@@ -13,7 +14,7 @@ def axis_angle_matrix(axis, angle):
   ])
 
 def reflection_matrix(axis):
-  axis = axis / np.linalg.norm(axis)
+  axis = axis / norm(axis)
   ux, uy, uz = axis
   return np.array([
     [(1-2*ux**2), (-2*ux*uy), (-2*ux*uz)],

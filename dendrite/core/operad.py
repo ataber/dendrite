@@ -28,24 +28,34 @@ class Operad:
   @property
   def symbolic_lambda(self):
     if self._symbolic_lambda is None:
-      self._symbolic_lambda = sympy.lambdify([x,y,z], self.substitute_symbols(), "sympy")
+      substituted = self.substitute_symbols()
+      if isinstance(substituted, sympy.Subs):
+        substituted = substituted.doit()
+      self._symbolic_lambda = sympy.lambdify([x,y,z], substituted, "sympy")
     return self._symbolic_lambda
 
   def substitute_symbols(self):
-    subs = {}
+    substitute_dict = {}
 
     if type(self.expression) == sympy.Subs:
-      gx, gy, gz = self.inputs["g"]()
-      f = self.inputs["f"]
-      return f(gx, gy, gz)
+      gx, gy, gz = self.inputs["g"].substitute_symbols()
+      g0, g1, g2 = self.expression.args[2]
+      f = self.inputs["f"].substitute_symbols()
+      return self.expression.subs({"f": f, g0: gx, g1: gy, g2: gz}, simultaneous=True)
     else:
       for name, value in self.inputs.items():
         if isinstance(value, Operad):
-          subs[name] = value()
+          substitute_dict[name] = value.substitute_symbols()
         else:
-          subs[name] = value
+          substitute_dict[name] = value
 
-    return substitute(self.expression, subs)
+    def substitute(expr, subs):
+      if isinstance(expr, tuple):
+        return tuple([substitute(e, subs) for e in expr])
+      # Use symbolic lambda instead of expr.subs; subs attempts to simplify at every step, causing much slow
+      return sympy.lambdify(subs.keys(), expr, "sympy")(**subs)
+
+    return substitute(self.expression, substitute_dict)
 
   def compute_tensorflow(self, X, Y, Z, scope=None, functional_scope=None):
     namespace = self.namespace or scope

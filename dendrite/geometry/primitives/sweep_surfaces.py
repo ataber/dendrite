@@ -56,7 +56,7 @@ def interpolating_canal(radius: F, endpoints: list, tangents: list) -> F:
 @E
 def scoped_canal(radius: F, endpoints: list, tangents: list) -> F:
   channel = interpolating_canal(radius, endpoints, tangents)
-  bounding_planes = [plane(tang, 0) << translate(p) for p, tang in zip(endpoints, tangents)]
+  bounding_planes = [plane(tang, 0) << translate(*p) for p, tang in zip(endpoints, tangents)]
   return channel // ~bounding_planes[0] // bounding_planes[1]
 
 @E

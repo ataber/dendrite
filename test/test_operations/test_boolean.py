@@ -7,7 +7,7 @@ from dendrite.geometry.primitives.quadrics import *
 class BooleanTest(TestCase):
   def test_union(self):
     s1 = sphere(1)
-    s2 = sphere(1) << translate([0,0,2])
+    s2 = sphere(1) << translate(0,0,2)
     u = s1 | s2
     self.assertEqual(u(0,0,0), s1(0,0,0))
     self.assertEqual(u(0,0,1), 0)

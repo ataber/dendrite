@@ -1,6 +1,6 @@
 from functools import wraps
 from numbers import Number
-from typing import List
+from typing import List, TypeVar
 import inspect
 import numpy as np
 import sympy
@@ -29,7 +29,12 @@ def coerce_output(func):
       return func(*args, **kwargs)
   return coerced_output
 
+# Custom type definitions
 rational_vector = List[sympy.Rational]
+three_vector = TypeVar("Vec3")
+functional_lambda = TypeVar("FunctionalLambda")
+transformation_lambda = TypeVar("TransformationLambda")
+
 registered_converters = {
   rational_vector: lambda x: [sympy.sympify(str(el), rational=True) for el in x]
 }

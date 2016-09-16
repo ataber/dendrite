@@ -8,6 +8,6 @@ def scale(a: F, s: F) -> F:
   return (a << scale_inputs(*(s,)*3)) * s
 
 @E
-def morph(a: F, b: F, t) -> F:
+def morph(a, b, t) -> F:
   t_bound = bound(t, 0, 1)
   return (a * t_bound) + (b * (1 - t_bound))

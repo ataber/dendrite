@@ -1,9 +1,10 @@
 import inspect
 import sympy
+from sympy.abc import x,y,z
 import numpy as np
 from functools import partial
 from collections import OrderedDict
-from dendrite.decorators.type_coercion import coerce_output
+from dendrite.decorators.type_coercion import *
 from dendrite.core.operad import Operad
 
 class Expression:
@@ -38,17 +39,14 @@ class Expression:
       # These types should not be symbolized
       pass_through_types = (list, str, int, float, tuple, Operad)
 
-      type_converters = {
-        # np.array is not a class, just a function for creating ndarrays
-        np.ndarray: np.array,
-      }
-
-      if issubclass(annotation, sympy.Tuple):
-        return sympy.Tuple(*sympy.symbols("gx gy gz"))
+      if annotation is three_vector:
+        return sympy.MatrixSymbol(s, 3, 1)
+      elif annotation is functional_lambda:
+        return sympy.Lambda([x, y, z], 'f')
+      elif annotation is transformation_lambda:
+        return sympy.Lambda([x, y, z], ('gx', 'gy', 'gz'))
       elif issubclass(annotation, pass_through_types):
         return substitute_dict[s]
-      elif annotation in type_converters:
-        return type_converters[annotation](substitute_dict[s])
       else:
         return sympy.Symbol(s)
 
@@ -61,10 +59,15 @@ class Expression:
         "g": substitute_dict["g"]
       }
     else:
-      input_dict = {
+      symbols_dict = {
         k.name: substitute_dict[k.name]
         for k in symbols if isinstance(k, sympy.Symbol)
       }
+      matrix_symbols_dict = {
+        k.name: np.reshape(substitute_dict[k.name], k.shape)
+        for k in symbols if isinstance(k, sympy.MatrixSymbol)
+      }
+      input_dict = {**symbols_dict, **matrix_symbols_dict}
 
     operad.set_inputs(**input_dict)
     return operad

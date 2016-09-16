@@ -8,7 +8,7 @@ from dendrite.core.algebra import Algebra
 from dendrite.core.transformation import Transformation
 from dendrite.core.expression import Expression
 from dendrite.mathematics.elementary import Max, Min
-from dendrite.decorators.type_coercion import convert_to_operad
+from dendrite.decorators.type_coercion import convert_to_operad, functional_lambda, transformation_lambda
 
 class Functional(Operad, Algebra):
   def __init__(self, expr, namespace=None):
@@ -72,9 +72,8 @@ class Functional(Operad, Algebra):
   def __lshift__(self, other):
     if isinstance(other, Transformation):
       @Expression
-      def composition(f, g: sympy.Tuple) -> Functional:
-        # Hack due to Subs not doing simultaneous substitution
-        return sympy.Subs(sympy.Subs(f, ('x', 'y', 'z'), ('fx', 'fy', 'fz')), ('fx', 'fy', 'fz'), g)
+      def composition(f: functional_lambda, g: transformation_lambda) -> Functional:
+        return sympy.Subs(f.expr, f.variables, g.expr)
       return composition(self, other)
     else:
       super().__lshift__(other)

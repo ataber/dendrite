@@ -1,4 +1,4 @@
-from sympy import diff, sympify, solve, I
+from sympy import diff, sympify, solve, integrate
 from sympy.solvers.solveset import invert_real
 from sympy.abc import x,y,z,t
 import numpy as np
@@ -19,9 +19,11 @@ def cylindrical() -> T:
 
 @E
 # http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.436.1302&rep=rep1&type=pdf
-def generalized_cylindrical(directrix: np.ndarray) -> TDT:
+def generalized_cylindrical(directrix: tuple) -> TDT:
   # Calculate Frenet frame https://www.wikiwand.com/en/Moving_frame#/Moving_tangent_frames
   tangent = np.array([diff(d, t) for d in directrix])
+  tangent /= norm(tangent)
+
   normal = np.array([diff(tan, t) for tan in tangent])
 
   if not np.any(normal):
@@ -34,12 +36,15 @@ def generalized_cylindrical(directrix: np.ndarray) -> TDT:
 
   p = np.array([x,y,z])
   p_prime = p - directrix
-
   distance = norm(p_prime)
+
   normal_coord = normal.dot(p_prime)
   binormal_coord = binormal.dot(p_prime)
   theta = arctan(normal_coord / binormal_coord)
-  return ((theta, t, distance), distance)
+
+  arc_length = integrate(sqrt(sum([diff(d, t)**2 for d in directrix])), (t, 0, t))
+  approximate_arc_length = arc_length.as_sum(10)
+  return ((theta, approximate_arc_length, distance), distance)
 
 @E
 def spherical() -> T:
