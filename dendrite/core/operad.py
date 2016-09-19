@@ -8,10 +8,10 @@ from dendrite.utils.tensorflow_utils import *
 from dendrite.codegen.glsl_codegen import glslcodegen
 
 class Operad:
-  def __init__(self, expression, namespace=None, to_minimize=None):
+  def __init__(self, expression, namespace=None, to_minimize=None, time_bounds=None):
     self.expression = expression
     self._to_minimize = to_minimize
-    self._time_bounds = None
+    self._time_bounds = time_bounds
     self._symbolic_lambda = None
     self.inputs = {}
     self.namespace = namespace

@@ -42,11 +42,11 @@ def channel_surface(radius: F, directrix: tuple) -> F:
   return eliminate_variable(time_dependent, t)
 
 @E
-def distance_surface(radius: F, directrix: tuple) -> TDF:
+def distance_surface(radius: F, directrix: tuple, time_bounds: tuple = None) -> TDF:
   distance_to_curve = [coordinate - curve for coordinate, curve in zip([x,y,z], directrix)]
   time_dependent = sphere(radius)(*distance_to_curve)
   diff_t = sympy.diff(time_dependent, t)
-  return (time_dependent, time_dependent)
+  return (time_dependent, time_dependent, time_bounds)
 
 @E
 def interpolating_canal(radius: F, endpoints: list, tangents: list) -> F:

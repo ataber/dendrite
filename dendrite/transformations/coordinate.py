@@ -19,7 +19,7 @@ def cylindrical() -> T:
 
 @E
 # http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.436.1302&rep=rep1&type=pdf
-def generalized_cylindrical(directrix: tuple) -> TDT:
+def generalized_cylindrical(directrix: tuple, bounds: tuple = (0, 1)) -> TDT:
   # Calculate Frenet frame https://www.wikiwand.com/en/Moving_frame#/Moving_tangent_frames
   tangent = np.array([diff(d, t) for d in directrix])
   tangent /= norm(tangent)
@@ -43,8 +43,8 @@ def generalized_cylindrical(directrix: tuple) -> TDT:
   theta = arctan(normal_coord / binormal_coord)
 
   arc_length = integrate(sqrt(sum([diff(d, t)**2 for d in directrix])), (t, 0, t))
-  approximate_arc_length = arc_length.as_sum(10)
-  return ((theta, approximate_arc_length, distance), distance)
+  approximate_arc_length = arc_length.as_sum(20)
+  return ((theta, approximate_arc_length, distance), distance, bounds)
 
 @E
 def spherical() -> T:
