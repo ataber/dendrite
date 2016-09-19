@@ -72,5 +72,5 @@ def export_to_cli(geometry, resolution, bounds):
 if __name__ == "__main__":
   object_name = sys.argv[1]
   debug = bool(sys.argv[2] if len(sys.argv) > 2 else False)
-  Object = importlib.import_module("dendrite.parts."+object_name)
+  Object = importlib.import_module("dendrite.models."+object_name)
   export_to_obj(Object.model, Object.default_resolution, Object.default_bounds)
