@@ -1,8 +1,6 @@
-import inspect
 import sympy
 import tensorflow as tf
 from sympy.abc import x, y, z, t
-from numbers import Number
 from collections import OrderedDict
 from dendrite.utils.tensorflow_utils import *
 from dendrite.codegen.glsl_codegen import glslcodegen

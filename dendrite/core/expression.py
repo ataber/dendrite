@@ -2,7 +2,6 @@ import inspect
 import sympy
 from sympy.abc import x,y,z
 import numpy as np
-from functools import partial
 from collections import OrderedDict
 from dendrite.decorators.type_coercion import *
 from dendrite.core.operad import Operad
