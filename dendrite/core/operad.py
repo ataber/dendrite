@@ -102,13 +102,22 @@ class Operad:
   def __repr__(self):
     return "<Core.Operad."+type(self).__name__+": "+str(self.namespace)+"> {"+str(self.expression)+"}"
 
-  def as_glsl(self):
-    glsl_funcs = [d.as_glsl() if isinstance(d, Operad) else d for d in self.inputs.values()]
-    glsl_funcs.append([glslcodegen((self.namespace.lower(), self.expression))])
-    return glsl_funcs
+  @property
+  def glsl_code(self):
+    return glslcodegen((self.namespace.lower(), self.expression))
 
-def substitute(expr, subs):
-  if isinstance(expr, tuple):
-    return sympy.Tuple(*[substitute(e, subs) for e in expr])
-  substituted = sympy.lambdify(subs.keys(), expr, "sympy")(**subs)
-  return substituted
+  def as_glsl(self):
+    glsl_funcs = {}
+    if isinstance(self.expression, sympy.Subs):
+      glsl_f = self.inputs["g"].glsl_code
+      glsl_g = self.inputs["f"].glsl_code
+      # glsl_funcs[self] =
+    else:
+      glsl_funcs[self] = self.glsl_code
+
+      for d in self.inputs.values():
+        if isinstance(d, Operad):
+          glsl_funcs[d] = d.as_glsl()
+        else:
+          glsl_funcs[d] = str(d)
+    return "\n".join(glsl_funcs.values())
