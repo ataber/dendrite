@@ -9,6 +9,7 @@ from dendrite.core.expression import Expression as E
 from dendrite.mathematics.elementary import sqrt
 from dendrite.mathematics.trigonometry import arctan, arccos
 from dendrite.mathematics.metric import norm
+from dendrite.mathematics.calculus import approximate_arc_length
 
 @E
 def cylindrical() -> T:
@@ -42,9 +43,7 @@ def generalized_cylindrical(directrix: tuple, bounds: tuple = (0, 1)) -> TDT:
   binormal_coord = binormal.dot(p_prime)
   theta = arctan(normal_coord / binormal_coord)
 
-  arc_length = integrate(sqrt(sum([diff(d, t)**2 for d in directrix])), (t, 0, t))
-  approximate_arc_length = arc_length.as_sum(20)
-  return ((theta, approximate_arc_length, distance), distance, bounds)
+  return ((theta, approximate_arc_length(directrix), distance), distance, bounds)
 
 @E
 def spherical() -> T:
