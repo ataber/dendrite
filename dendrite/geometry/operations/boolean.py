@@ -6,11 +6,11 @@ from dendrite.core.expression import Expression as E
 # max = - min (-f,-g)
 # IQ gives us the smooth intersect but we want union
 @E
-def polynomial_smooth_union(a: F, b: F, k: float = 0.1) -> F:
-  def polynomial_smooth_min(a, b, k, n=0.5):
+def polynomial_smooth_union(a, b, k: float = 0.1) -> F:
+  def polynomial_smooth_min(a, b, k):
     def mix(x, y, a) -> F:
       return -x*(a-1) + y*a
-    h = (((b - a) / k) * n) + n
+    h = bound((((b - a) / k) * 0.5) + 0.5, 0.0, 1.0)
     return mix(b, a, h) + (h * (h - 1) * k)
   return -polynomial_smooth_min(-a, -b, k)
 

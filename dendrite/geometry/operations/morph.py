@@ -9,5 +9,5 @@ def scale(a: F, s: F) -> F:
 
 @E
 def morph(a, b, t) -> F:
-  t_bound = bound(t, 0, 1)
+  t_bound = bound(t, 0.0, 1.0)
   return (a * t_bound) + (b * (1 - t_bound))
