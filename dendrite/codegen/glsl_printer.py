@@ -6,7 +6,7 @@ GLSL expressions.
 
 """
 
-from sympy.core import S
+from sympy.core import S, symbols, Tuple
 from sympy.codegen.ast import Assignment
 from sympy.printing.codeprinter import CodePrinter
 from sympy.printing.precedence import precedence
@@ -142,6 +142,18 @@ class GLSLCodePrinter(CodePrinter):
 
   def _print_NegativeInfinity(self, expr):
     return '-1./0.'
+
+  def _print_Subs(self, expr):
+    # HACK: free symbols should be the names of compiled GLSL functions to call
+    g, f = list(expr.free_symbols)
+    function_call = self._print(g) + "(" + ", ".join([self._print(a) for a in expr.args[1]]) + ");"
+    print(function_call)
+    temp_symbols = symbols("gx gy gz")
+    assign_to = Tuple(*temp_symbols)
+    assign = self._print(Assignment(assign_to, function_call))
+    print(assign)
+    composed_call = self._print(f) + self._print(temp_symbols)
+    return assign + "\n" + composed_call
 
   def _print_Piecewise(self, expr):
     if expr.args[-1].cond != True:
