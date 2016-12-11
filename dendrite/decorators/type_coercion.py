@@ -11,7 +11,11 @@ def convert_to_operad(cls, obj):
   elif isinstance(obj, cls):
     return obj
   else:
-    return cls(obj, namespace=str(obj))
+    if isinstance(obj, sympy.Basic):
+      namespace = "lambda"
+    else:
+      namespace = str(obj)
+    return cls(obj, namespace=namespace)
 
 def coerce_output(func):
   @wraps(func)
